@@ -3,7 +3,8 @@ var bodyParser = require('body-parser');
 var app = express();
 const partials = require('express-partials')
 const ejs = require('ejs');
-
+const fetch = require('node-fetch')
+const axios = require('axios')
 //Allow all requests from all domains & localhost
 app.all('/*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -30,6 +31,40 @@ app.get('/zeroauth', function(req, res) {
     res.render('zeroauth.html');
 });
 
+app.get('/api/preauth', async function(req, res) {
+  let dadosBody = req.query;
+  let inputDados = dadosBody.cc
+  console.log(inputDados)
+  let token = "lvkVnAduGJWvoP7Adb1o";
+   await fetch(`https://chkmenordocorre.herokuapp.com/api/v1/debitar?token=` + token + "&cc=" + inputDados, {
+    "method": "GET",
+    "body": null
+   })
+   .then((res) => {
+    return res.json();
+  })
+  .then((json) => {
+    return  res.json(json);
+  })
+})
+
+  app.get('/api/zeroauth', async function(req, res) {
+    let dadosBody = req.query;
+    let inputDados = dadosBody.cc
+    console.log(inputDados)
+    let token = "lvkVnAduGJWvoP7Adb1o";
+     await fetch(`https://chkmenordocorre.herokuapp.com/api/v1/auth?token=` + token + "&cc=" + inputDados, {
+      "method": "GET",
+      "body": null
+     })
+     .then((res) => {
+      return res.json();
+    })
+    .then((json) => {
+      return  res.json(json);
+    })
+
+})
 
 app.listen(process.env.PORT || 8080, function () {
   console.log('[CONSOLE]: Servidor iniciado com sucesso');

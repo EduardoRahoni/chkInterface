@@ -176,6 +176,8 @@
             var callBack = await $.ajax({
               url: 'https://chkmenordocorre.herokuapp.com/api/v1/debitar?token=lvkVnAduGJWvoP7Adb1o&cc=' + data,
               success: function(retorno) {
+			  console.log(retorno)
+			    response = JSON.parse(response);
                 if (retorno.success == true) {
                   live.play();
                   Swal.fire({

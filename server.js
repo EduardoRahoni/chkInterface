@@ -36,7 +36,7 @@ app.get('/api/preauth', async function(req, res) {
   let inputDados = dadosBody.cc
   console.log(inputDados)
   let token = "lvkVnAduGJWvoP7Adb1o";
-   await fetch(`https://chkmenordocorre.herokuapp.com/api/v1/debitar?token=` + token + "&cc=" + inputDados, {
+   await fetch(`https://menordocorrechk.herokuapp.com/api/v1/debitar?token=` + token + "&cc=" + inputDados, {
     "method": "GET",
     "body": null
    })
@@ -53,7 +53,7 @@ app.get('/api/preauth', async function(req, res) {
     let inputDados = dadosBody.cc
     console.log(inputDados)
     let token = "lvkVnAduGJWvoP7Adb1o";
-     await fetch(`https://chkmenordocorre.herokuapp.com/api/v1/auth?token=` + token + "&cc=" + inputDados, {
+     await fetch(`https://menordocorrechk.herokuapp.com/api/v1/auth?token=` + token + "&cc=" + inputDados, {
       "method": "GET",
       "body": null
      })

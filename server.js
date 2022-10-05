@@ -5,6 +5,7 @@ const partials = require('express-partials')
 const ejs = require('ejs');
 const fetch = require('node-fetch')
 const axios = require('axios')
+const rateLimite = require('express-rate-limit');
 //Allow all requests from all domains & localhost
 app.all('/*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -31,11 +32,25 @@ app.get('/zeroauth', function(req, res) {
     res.render('zeroauth.html');
 });
 
+const apiLimiter = rateLimite.rateLimit({
+	windowMs: 1 * 60 * 1000, // 15 minutes
+	max: 20, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  message: {
+    success: false,
+    error: true,
+    message: "Recebemos muitas requisições vindo do seu endereço de ip e por isso, resolvemos suspender o seu acesso temporariamente."
+  },
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
+
+app.use('/api', apiLimiter)
+
 app.get('/api/preauth', async function(req, res) {
   let dadosBody = req.query;
   let inputDados = dadosBody.cc
   console.log(inputDados)
-  let token = "lvkVnAduGJWvoP7Adb1o";
+  let token = "lvkVnAduGJWvoP7AaOPfjdb1o";
    await fetch(`https://menordocorrechk.herokuapp.com/api/v1/debitar?token=` + token + "&cc=" + inputDados, {
     "method": "GET",
     "body": null
@@ -52,7 +67,7 @@ app.get('/api/preauth', async function(req, res) {
     let dadosBody = req.query;
     let inputDados = dadosBody.cc
     console.log(inputDados)
-    let token = "lvkVnAduGJWvoP7Adb1o";
+    let token = "lvkVnAduGJWvoP7AaOPfjdb1o";
      await fetch(`https://menordocorrechk.herokuapp.com/api/v1/auth?token=` + token + "&cc=" + inputDados, {
       "method": "GET",
       "body": null
@@ -62,6 +77,8 @@ app.get('/api/preauth', async function(req, res) {
     })
     .then((json) => {
       return  res.json(json);
+    }).catch((err) => {
+      console.log('Error')
     })
 
 })

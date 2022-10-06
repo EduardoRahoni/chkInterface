@@ -188,7 +188,11 @@
                 `);
                 removelinha();
                 lives = lives +1;
-              } else {
+              } else if(retorno.error == true && !retorno.cartao) {
+                $('#lista_aprovadas').append(`
+                <span class="badge badge-danger">FALHA INTERNA</span> » <span class="badge badge-danger">${retorno.message}</span>
+                `)
+              }else {
                 let binInfos = `${retorno.bin.scheme} ${retorno.bin.brand}, ${retorno.bin.country.name}`
                 $('#lista_reprovadas').append(`
                 <span class="badge badge-danger">REPROVADA</span> » <span class="badge badge-light">${retorno.cartao.numero} » ${retorno.cartao.validade.mes} » ${retorno.cartao.validade.ano} » ${retorno.cartao.cvv}</span> » <span class="badge badge-warning">[${binInfos.toUpperCase()}]</span> » <span class="badge badge-light">[Retorno: ${retorno.message}]</span> » <span class="badge badge-light">@menordocorre</span><br>`);

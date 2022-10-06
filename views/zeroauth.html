@@ -20,7 +20,7 @@
             <div class="card">
               <div class="card-body text-center">
                 <h5 style="font-family: 'Trebuchet MS', sans-serif; font-size: 20px;">Checker De Full - Zero Auth</h5>
-                <center><h9>FORMATO: xxxxxxxxxxxxxxx|xx|xxxx|xxx                </h9></center>
+                <center><h9>FORMATO: xxxxxxxxxxxxxxx|xx|xxxx|xxx</h9></center>
                 <textarea style="height: 8.06rem;" class="form-control text-center form-checker mb-2" placeholder="Cole sua DB aqui"></textarea>
                 <button class="btn btn-success btn-play text-white" style="width: 49%; float: left;"><i class="fa fa-play"></i> INICIAR</button>
                 <button class="btn btn-danger btn-stop text-white" style="width: 49%; float: right;" disabled="disabled"><i class="fa fa-stop"></i> PARAR</button>
@@ -124,7 +124,7 @@
       });
   
   
-      $('.btn-play').click(function() {
+      $('.btn-play').click(async function() {
   
         var lista = $('.form-checker').val().trim();
         var array = lista.split('\n');
@@ -171,10 +171,13 @@
         $('.carregadas').text(total);
         $('.btn-play').attr('disabled', true);
         $('.btn-stop').attr('disabled', false);
-  
-        line.forEach(async function(data) {
+        await enviarRequest();
+        
+        async function enviarRequest() {
+        for (var linha in array) {
+          let data = array[linha];
           var callBack = await $.ajax({
-            url: 'api/zeroauth?cc=' + data,
+            url: 'api/zeroauth?cc=' + array[linha],
             success: function(retorno) {
       console.log(retorno)
               if (retorno.success == true) {
@@ -184,14 +187,26 @@
                 });
                 let binInfos = `${retorno.bin.scheme} ${retorno.bin.brand}, ${retorno.bin.country.name}`
                 $('#lista_aprovadas').append(`
-                <span class="badge badge-success">APROVADA</span> » <span class="badge badge-secondary">${retorno.cartao.numero} » ${retorno.cartao.validade.mes} » ${retorno.cartao.validade.ano} » ${retorno.cartao.cvv}</span> » <span class="badge badge-warning">[${binInfos.toUpperCase()}]</span> » <span class="badge badge-secondary">[Retorno: ${retorno.message}]</span> » <span class="badge badge-light">@menordocorre</span><br>
+                <span class="badge badge-success">APROVADA</span> » <span class="badge badge-secondary">${retorno.cartao.numero} » ${retorno.cartao.validade.mes} » ${retorno.cartao.validade.ano} » ${retorno.cartao.cvv}</span> » <span class="badge badge-warning">[${binInfos.toUpperCase()}]</span> » <span class="badge badge-secondary">[Retorno: ${retorno.message}]</span> » <span class="badge badge-light">@omenordocorre</span><br>
                 `);
                 removelinha();
                 lives = lives +1;
+              } else if(retorno.error == true && !retorno.cartao) {
+                $('#lista_reprovadas').append(`
+                <span class="badge badge-danger">FALHA INTERNA</span> » <span class="badge badge-danger">${data}</span> » <span class="badge badge-danger">${retorno.message}</span> » <span class="badge badge-light">@omenordocorre</span><br>
+                `)
+                removelinha();
+                dies = dies +1;
+              } else if(retorno.error == false && retorno.message === "Seu cartão não passou na validação anti-gerada.") {
+                $('#lista_reprovadas').append(`
+                <span class="badge badge-danger">ANTI GERADA</span> » <span class="badge badge-danger">${data}</span> » <span class="badge badge-danger">${retorno.message}</span> » <span class="badge badge-light">@omenordocorre</span><br>
+                `)
+                removelinha();
+                dies = dies +1;
               } else {
                 let binInfos = `${retorno.bin.scheme} ${retorno.bin.brand}, ${retorno.bin.country.name}`
                 $('#lista_reprovadas').append(`
-                <span class="badge badge-danger">REPROVADA</span> » <span class="badge badge-light">${retorno.cartao.numero} » ${retorno.cartao.validade.mes} » ${retorno.cartao.validade.ano} » ${retorno.cartao.cvv}</span> » <span class="badge badge-warning">[${binInfos.toUpperCase()}]</span> » <span class="badge badge-light">[Retorno: ${retorno.message}]</span> » <span class="badge badge-light">@menordocorre</span><br>`);
+                <span class="badge badge-danger">REPROVADA</span> » <span class="badge badge-light">${retorno.cartao.numero} » ${retorno.cartao.validade.mes} » ${retorno.cartao.validade.ano} » ${retorno.cartao.cvv}</span> » <span class="badge badge-warning">[${binInfos.toUpperCase()}]</span> » <span class="badge badge-light">[Retorno: ${retorno.message}]</span> » <span class="badge badge-light">@omenordocorre</span><br>`);
                 removelinha();
                 dies = dies +1;
               }
@@ -218,7 +233,8 @@
             callBack.abort();
             return false;
           });
-        });
+        };
+      }
       });
     });
   

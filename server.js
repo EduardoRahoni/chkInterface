@@ -71,6 +71,6 @@ app.get('/api/preauth', async function(req, res) {
 
 })
 
-app.listen(process.env.PORT || 8080, function () {
+app.listen(process.env.PORT || 3000, function () {
   console.log('[CONSOLE]: Servidor iniciado com sucesso');
 });
